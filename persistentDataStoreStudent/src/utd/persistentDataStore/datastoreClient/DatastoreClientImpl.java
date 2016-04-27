@@ -43,7 +43,7 @@ public class DatastoreClientImpl implements DatastoreClient
 			OutputStream outputStream = socket.getOutputStream();
 			
 			logger.debug("Writing Message");
-			StreamUtil.writeLine("Write\n", outputStream);
+			StreamUtil.writeLine("write", outputStream);
 			StreamUtil.writeLine(name, outputStream);
 			StreamUtil.writeLine(Integer.toString(data.length), outputStream);
 			StreamUtil.writeData(data, outputStream);
@@ -51,7 +51,7 @@ public class DatastoreClientImpl implements DatastoreClient
 			logger.debug("Reading Response");
 			String result = StreamUtil.readLine(inputStream);
 			logger.debug("Response code:" + result);
-			
+			socket.close();
 		}
 		catch (IOException ex) {
 			throw new ClientException(ex.getMessage(), ex);
@@ -77,7 +77,7 @@ public class DatastoreClientImpl implements DatastoreClient
 			OutputStream outputStream = socket.getOutputStream();
 			
 			logger.debug("Read Message");
-			StreamUtil.writeLine("Read\n", outputStream);
+			StreamUtil.writeLine("read", outputStream);
 			StreamUtil.writeLine(name, outputStream);
 			
 			logger.debug("Reading Response");
@@ -87,6 +87,7 @@ public class DatastoreClientImpl implements DatastoreClient
 			readResp = new byte[sz];
 			readResp = StreamUtil.readData(sz, inputStream);
 			logger.debug("Response " + result);
+			socket.close();
 			
 		}
 		catch (IOException ex) {
@@ -112,13 +113,13 @@ public class DatastoreClientImpl implements DatastoreClient
 			OutputStream outputStream = socket.getOutputStream();
 			
 			logger.debug("Delete Message");
-			StreamUtil.writeLine("Delete\n", outputStream);
+			StreamUtil.writeLine("delete", outputStream);
 			StreamUtil.writeLine(name, outputStream);
 			
 			logger.debug("Reading Response");
 			String result = StreamUtil.readLine(inputStream);
 			logger.debug("Response code:" + result);
-			
+			socket.close();
 		}
 		catch (IOException ex) {
 			throw new ClientException(ex.getMessage(), ex);
@@ -144,7 +145,7 @@ public class DatastoreClientImpl implements DatastoreClient
 			OutputStream outputStream = socket.getOutputStream();
 			
 			logger.debug("Directory Message");
-			StreamUtil.writeLine("Directory\n", outputStream);
+			StreamUtil.writeLine("directory", outputStream);
 			
 			logger.debug("Reading Response");
 			String result = StreamUtil.readLine(inputStream);
@@ -157,6 +158,7 @@ public class DatastoreClientImpl implements DatastoreClient
 			}
 			logger.debug("Response " + result + "number of files:"+num);
 			
+			socket.close();
 		
 		}
 		catch (IOException ex) {

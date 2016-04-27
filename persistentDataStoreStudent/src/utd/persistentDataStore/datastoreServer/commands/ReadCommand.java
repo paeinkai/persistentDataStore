@@ -2,6 +2,7 @@ package utd.persistentDataStore.datastoreServer.commands;
 
 import java.io.IOException;
 
+import utd.persistentDataStore.utils.FileUtil;
 import utd.persistentDataStore.utils.ServerException;
 import utd.persistentDataStore.utils.StreamUtil;
 
@@ -13,24 +14,15 @@ public class ReadCommand extends ServerCommand {
 
 	@Override
 	public void run() throws IOException, ServerException {
-		// Read message
-		String inMessage = StreamUtil.readLine(inputStream);
-		logger.debug("inMessage: " + inMessage);
+		String filename = StreamUtil.readLine(inputStream);
+		
+		logger.debug("ReadCommand filename: " + filename);
 
-		// Write response
-		String outMessage = reverse(inMessage) + "\n";
-		StreamUtil.writeLine(outMessage, outputStream);
-		logger.debug("Finished writing message");
+		byte[] data = FileUtil.readData(filename);
+		this.sendOK();
+		StreamUtil.writeData(data, outputStream);
+		
+		logger.debug("Finished reading file.");
 	}
 
-	private String reverse(String data)
-	{
-		byte dataBuff[] = data.getBytes();
-		int buffSize = dataBuff.length;
-		byte reverseBuff[] = new byte[buffSize];
-		for (int idx = 0; idx < buffSize; idx++) {
-			reverseBuff[idx] = dataBuff[(buffSize - idx) - 1];
-		}
-		return new String(reverseBuff);
-	}
 }

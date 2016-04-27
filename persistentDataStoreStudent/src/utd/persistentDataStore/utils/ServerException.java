@@ -1,5 +1,6 @@
 package utd.persistentDataStore.utils;
 
+@SuppressWarnings("serial")
 public class ServerException extends Exception
 {
 	public ServerException(String msg)

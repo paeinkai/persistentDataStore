@@ -1,5 +1,6 @@
 package utd.persistentDataStore.datastoreClient;
 
+@SuppressWarnings("serial")
 public class ClientException extends Exception
 {
 	public ClientException(String msg)

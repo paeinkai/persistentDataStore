@@ -14,9 +14,6 @@ import utd.persistentDataStore.datastoreServer.commands.ReadCommand;
 import utd.persistentDataStore.datastoreServer.commands.WriteCommand;
 import utd.persistentDataStore.datastoreServer.commands.DirectoryCommand;
 import utd.persistentDataStore.datastoreServer.commands.DeleteCommand;
-import utd.persistentDataStore.simpleSocket.server.EchoHandler;
-import utd.persistentDataStore.simpleSocket.server.Handler;
-import utd.persistentDataStore.simpleSocket.server.ReverseHandler;
 import utd.persistentDataStore.utils.ServerException;
 import utd.persistentDataStore.utils.StreamUtil;
 
@@ -26,6 +23,7 @@ public class DatastoreServer
 
 	static public final int port = 10023;
 
+	@SuppressWarnings("resource")
 	public void startup() throws IOException
 	{
 		logger.debug("Starting Service at port " + port);
@@ -65,37 +63,36 @@ public class DatastoreServer
 				StreamUtil.closeSocket(inputStream);
 			}
 		}
+		
 	}
 
 	private ServerCommand dispatchCommand(InputStream inputStream) throws ServerException
 	{
-		// Need to implement
-		try {
-			String commandString = StreamUtil.readLine(inputStream);
-			
-			if ("Read".equalsIgnoreCase(commandString)) {
-				ServerCommand servCmd = new ReadCommand();
-				return servCmd;
-			}
-			else if ("Write".equalsIgnoreCase(commandString)) {
-				ServerCommand servCmd = new WriteCommand();
-				return servCmd;
-			}
-			else if ("directory".equalsIgnoreCase(commandString)) {
-				ServerCommand servCmd = new DirectoryCommand();
-				return servCmd;
-			}
-			else if ("delete".equalsIgnoreCase(commandString)) {
-				ServerCommand servCmd = new DeleteCommand();
-				return servCmd;
-			}
-			else {	
-				throw new ServerException("Unknown Request: " + commandString);
-			}
-		} catch(IOException e) {
-			System.err.println("Unknown Request error: " + e);
+		ServerCommand result = null;
+		try
+		{
+			String command_str = StreamUtil.readLine(inputStream);
+		
+			switch (command_str.toLowerCase())
+			{
+			case "write":
+				result = new WriteCommand();
+				break;
+			case "read":
+				result = new ReadCommand();
+				break;
+			case "delete":
+				result = new DeleteCommand();
+				break;
+			case "directory":
+				result = new DirectoryCommand();
+				break;
+			default:
+				throw new ServerException("Invalid command: " + command_str);
+			}	
 		}
-		return null;
+		catch (IOException ex) {}
+		return result;
 	}
 
 	public static void main(String args[])

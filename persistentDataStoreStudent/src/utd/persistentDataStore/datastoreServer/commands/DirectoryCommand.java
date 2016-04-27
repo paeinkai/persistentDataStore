@@ -1,7 +1,9 @@
 package utd.persistentDataStore.datastoreServer.commands;
 
 import java.io.IOException;
+import java.util.List;
 
+import utd.persistentDataStore.utils.FileUtil;
 import utd.persistentDataStore.utils.ServerException;
 import utd.persistentDataStore.utils.StreamUtil;
 
@@ -13,14 +15,15 @@ public class DirectoryCommand extends ServerCommand {
 	
 	@Override
 	public void run() throws IOException, ServerException {
-		// Read message
-		String inMessage = StreamUtil.readLine(inputStream);
-		logger.debug("inMessage: " + inMessage);
-
-		// Write response
-		String outMessage = inMessage + "\n";
-		StreamUtil.writeLine(outMessage, outputStream);
-		logger.debug("Finished writing message");
+		logger.debug("DirectoryCommand received");
+		List<String> directory = FileUtil.directory();
+		this.sendOK();
+		StreamUtil.writeLine(""+directory.size(), outputStream);
+		for (String filename : directory)
+		{
+			StreamUtil.writeLine(filename, outputStream);
+		}
+		logger.debug("Finished sending directory");
 	}
-
+	
 }
