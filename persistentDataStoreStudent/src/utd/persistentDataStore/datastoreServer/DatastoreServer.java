@@ -14,6 +14,7 @@ import utd.persistentDataStore.datastoreServer.commands.ReadCommand;
 import utd.persistentDataStore.datastoreServer.commands.WriteCommand;
 import utd.persistentDataStore.datastoreServer.commands.DirectoryCommand;
 import utd.persistentDataStore.datastoreServer.commands.DeleteCommand;
+import utd.persistentDataStore.utils.FileUtil;
 import utd.persistentDataStore.utils.ServerException;
 import utd.persistentDataStore.utils.StreamUtil;
 
@@ -105,5 +106,7 @@ public class DatastoreServer
 			logger.error("Unable to start server. " + ex.getMessage());
 			ex.printStackTrace();
 		}
+		
+		
 	}
 }

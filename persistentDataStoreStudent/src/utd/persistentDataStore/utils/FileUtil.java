@@ -20,6 +20,7 @@ public class FileUtil
 	
 	public static void writeData(String name, byte data[]) throws IOException
 	{
+		if (!directory.exists()) directory.mkdirs();
 		File file = new File(directory, name);
 		file.createNewFile();
 		OutputStream ostream = new FileOutputStream(file);

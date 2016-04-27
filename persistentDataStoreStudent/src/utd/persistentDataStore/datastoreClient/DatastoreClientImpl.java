@@ -21,10 +21,12 @@ public class DatastoreClientImpl implements DatastoreClient
 	private InetAddress address;
 	private int port;
 
+
 	public DatastoreClientImpl(InetAddress address, int port)
 	{
 		this.address = address;
 		this.port = port;
+		
 	}
 
 	/* (non-Javadoc)
@@ -48,12 +50,17 @@ public class DatastoreClientImpl implements DatastoreClient
 			StreamUtil.writeLine(Integer.toString(data.length), outputStream);
 			StreamUtil.writeData(data, outputStream);
 			
-			logger.debug("Reading Response");
-			String result = StreamUtil.readLine(inputStream);
-			logger.debug("Response code:" + result);
+			logger.debug("Reading response");
+			String response = StreamUtil.readLine(inputStream);
+			logger.debug("Response code:" + response);
 			socket.close();
+			if (!"ok".equalsIgnoreCase(response))
+			{
+				throw new ClientException(response);
+			}
 		}
 		catch (IOException ex) {
+			System.err.println("IOException on the things");
 			throw new ClientException(ex.getMessage(), ex);
 		}
 	}
@@ -81,14 +88,21 @@ public class DatastoreClientImpl implements DatastoreClient
 			StreamUtil.writeLine(name, outputStream);
 			
 			logger.debug("Reading Response");
-			String result = StreamUtil.readLine(inputStream);
-			size = StreamUtil.readLine(inputStream);
-			int sz = Integer.parseInt(size);
-			readResp = new byte[sz];
-			readResp = StreamUtil.readData(sz, inputStream);
-			logger.debug("Response " + result);
-			socket.close();
-			
+			String response = StreamUtil.readLine(inputStream);
+			if ("ok".equalsIgnoreCase(response))
+			{
+				size = StreamUtil.readLine(inputStream);
+				int sz = Integer.parseInt(size);
+				readResp = StreamUtil.readData(sz, inputStream);
+				logger.debug("Response " + response);
+				inputStream.close();
+				socket.close();
+			}
+			else
+			{
+				socket.close();
+				throw new ClientException(response);
+			}
 		}
 		catch (IOException ex) {
 			throw new ClientException(ex.getMessage(), ex);
@@ -117,9 +131,14 @@ public class DatastoreClientImpl implements DatastoreClient
 			StreamUtil.writeLine(name, outputStream);
 			
 			logger.debug("Reading Response");
-			String result = StreamUtil.readLine(inputStream);
-			logger.debug("Response code:" + result);
+			String response = StreamUtil.readLine(inputStream);
 			socket.close();
+			if (!"ok".equalsIgnoreCase(response))
+			{
+				throw new ClientException(response);
+				
+			}
+			
 		}
 		catch (IOException ex) {
 			throw new ClientException(ex.getMessage(), ex);
@@ -148,18 +167,23 @@ public class DatastoreClientImpl implements DatastoreClient
 			StreamUtil.writeLine("directory", outputStream);
 			
 			logger.debug("Reading Response");
-			String result = StreamUtil.readLine(inputStream);
-			String num = StreamUtil.readLine(inputStream);
-			int nameSize = Integer.parseInt(num);
-			for (int i=0; i < nameSize ; i++) {	//TODO: use correct nameSize as input parameter
-				bList = StreamUtil.readData(nameSize, inputStream);
-				String name = new String(bList);
-				nameList.add(name);
+			String response = StreamUtil.readLine(inputStream);
+			if ("ok".equalsIgnoreCase(response))
+			{
+				String num = StreamUtil.readLine(inputStream);
+				int nameSize = Integer.parseInt(num);
+				for (int i=0; i < nameSize ; i++) {	
+					bList = StreamUtil.readData(nameSize, inputStream);
+					String name = new String(bList);
+					nameList.add(name);
+				}
+				socket.close();
 			}
-			logger.debug("Response " + result + "number of files:"+num);
-			
-			socket.close();
-		
+			else
+			{
+				socket.close();
+				throw new ClientException(response);
+			}
 		}
 		catch (IOException ex) {
 			throw new ClientException(ex.getMessage(), ex);

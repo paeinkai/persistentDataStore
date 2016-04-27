@@ -1,4 +1,4 @@
-package utd.persistentDataStore.datastoreServer.commands;
+	package utd.persistentDataStore.datastoreServer.commands;
 
 import java.io.IOException;
 
@@ -20,6 +20,7 @@ public class ReadCommand extends ServerCommand {
 
 		byte[] data = FileUtil.readData(filename);
 		this.sendOK();
+		StreamUtil.writeLine(""+data.length, outputStream);
 		StreamUtil.writeData(data, outputStream);
 		
 		logger.debug("Finished reading file.");
