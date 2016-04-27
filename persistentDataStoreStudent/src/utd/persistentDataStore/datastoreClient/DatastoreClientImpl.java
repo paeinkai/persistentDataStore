@@ -26,7 +26,7 @@ public class DatastoreClientImpl implements DatastoreClient
 	{
 		this.address = address;
 		this.port = port;
-		
+
 	}
 
 	/* (non-Javadoc)
@@ -37,10 +37,13 @@ public class DatastoreClientImpl implements DatastoreClient
 	{
 		logger.debug("Executing Write Operation");
 		try {
+			/*
 			logger.debug("Opening Socket");
 			Socket socket = new Socket();
 			SocketAddress saddr = new InetSocketAddress(address, port);
 			socket.connect(saddr);
+			*/
+			Socket socket = new Socket(address, port);
 			InputStream inputStream = socket.getInputStream();
 			OutputStream outputStream = socket.getOutputStream();
 			
@@ -53,14 +56,15 @@ public class DatastoreClientImpl implements DatastoreClient
 			logger.debug("Reading response");
 			String response = StreamUtil.readLine(inputStream);
 			logger.debug("Response code:" + response);
-			socket.close();
+			StreamUtil.closeSocket(inputStream);
 			if (!"ok".equalsIgnoreCase(response))
 			{
 				throw new ClientException(response);
 			}
 		}
 		catch (IOException ex) {
-			System.err.println("IOException on the things");
+			System.err.println("IOException on write");
+			ex.printStackTrace();
 			throw new ClientException(ex.getMessage(), ex);
 		}
 	}
@@ -77,9 +81,8 @@ public class DatastoreClientImpl implements DatastoreClient
 		
 		try {
 			logger.debug("Opening Socket");
-			Socket socket = new Socket();
-			SocketAddress saddr = new InetSocketAddress(address, port);
-			socket.connect(saddr);
+			Socket socket = new Socket(address, port);
+			
 			InputStream inputStream = socket.getInputStream();
 			OutputStream outputStream = socket.getOutputStream();
 			
@@ -95,7 +98,6 @@ public class DatastoreClientImpl implements DatastoreClient
 				int sz = Integer.parseInt(size);
 				readResp = StreamUtil.readData(sz, inputStream);
 				logger.debug("Response " + response);
-				inputStream.close();
 				socket.close();
 			}
 			else
@@ -120,9 +122,8 @@ public class DatastoreClientImpl implements DatastoreClient
 		logger.debug("Executing Delete Operation");
 		try {
 			logger.debug("Opening Socket");
-			Socket socket = new Socket();
-			SocketAddress saddr = new InetSocketAddress(address, port);
-			socket.connect(saddr);
+			Socket socket = new Socket(address, port);
+
 			InputStream inputStream = socket.getInputStream();
 			OutputStream outputStream = socket.getOutputStream();
 			
@@ -157,9 +158,8 @@ public class DatastoreClientImpl implements DatastoreClient
 		
 		try {
 			logger.debug("Opening Socket");
-			Socket socket = new Socket();
-			SocketAddress saddr = new InetSocketAddress(address, port);
-			socket.connect(saddr);
+			Socket socket = new Socket(address, port);
+
 			InputStream inputStream = socket.getInputStream();
 			OutputStream outputStream = socket.getOutputStream();
 			
